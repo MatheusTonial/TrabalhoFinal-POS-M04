@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -36,34 +37,42 @@ fun FormTextField(
     keyboardImeAction: ImeAction = ImeAction.Next,
     keyboardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    trailingIcon: @Composable (() -> Unit)? = null
+    trailingIcon: @Composable (() -> Unit)? = null,
+    imageVector: ImageVector? = null,
 ) {
     val hasError = errorMessageCode > 0
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = value,
-            onValueChange = onValueChanged,
-            label = { Text(label) },
-            maxLines = 1,
-            enabled = enabled,
-            readOnly = readOnly,
-            isError = hasError,
-            keyboardOptions = KeyboardOptions(
-                capitalization = keyboardCapitalization,
-                imeAction = keyboardImeAction,
-                keyboardType = keyboardType
-            ),
-            visualTransformation = visualTransformation,
-            trailingIcon = trailingIcon
-        )
-        if (hasError) {
-            Text(
-                text = stringResource(errorMessageCode),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(top = 8.dp)
+    // Alinha o campo de texto usando o FormFieldRow para manter o ícone à esquerda
+    FormFieldRow(
+        modifier = modifier,
+        label = label,
+        imageVector = imageVector
+    ) {
+        Column(modifier = Modifier.padding(start = 16.dp)) {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = value,
+                onValueChange = onValueChanged,
+                label = { Text(label) },
+                maxLines = 1,
+                enabled = enabled,
+                readOnly = readOnly,
+                isError = hasError,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = keyboardCapitalization,
+                    imeAction = keyboardImeAction,
+                    keyboardType = keyboardType
+                ),
+                visualTransformation = visualTransformation,
+                trailingIcon = trailingIcon,
             )
+            if (hasError) {
+                Text(
+                    text = stringResource(errorMessageCode),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
@@ -73,7 +82,7 @@ fun FormTextField(
 private fun FormTextFieldPreview() {
     TrabalhoFinalTheme {
         var value by remember { mutableStateOf("Teste") }
-        var errorMessageCode = if (value.isBlank()) {
+        val errorMessageCode = if (value.isBlank()) {
             R.string.descricao_obrigatoria
         } else {
             0

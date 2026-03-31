@@ -11,6 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
@@ -211,7 +213,8 @@ private fun FormContent(
             errorMessageCode = descricao.codigoMensagemErro,
             onValueChanged = onDescricaoAlterada,
             keyboardCapitalization = KeyboardCapitalization.Words,
-            enabled = !processando
+            enabled = !processando,
+            imageVector = Icons.AutoMirrored.Filled.Notes
         )
         FormTextField(
             modifier = formTextFieldModifier,
@@ -220,7 +223,8 @@ private fun FormContent(
             errorMessageCode = valor.codigoMensagemErro,
             onValueChanged = onValorAlterado,
             keyboardType = KeyboardType.Number,
-            enabled = !processando
+            enabled = !processando,
+            imageVector = Icons.Filled.AttachMoney
         )
         FormTextField(
             modifier = formTextFieldModifier,
