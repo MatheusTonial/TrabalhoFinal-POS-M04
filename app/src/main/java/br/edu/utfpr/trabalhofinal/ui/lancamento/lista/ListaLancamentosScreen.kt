@@ -260,7 +260,7 @@ fun Totalizador(
             modifier = Modifier.width(100.dp),
             textAlign = TextAlign.End,
             text = valor.formatar(),
-            color = if(valor > BigDecimal.ZERO) Color(0xFF00984E) else Color(0xFFCF5355) //fiz aqui a validação par nao mudar a cor do texto
+            color = if(valor > BigDecimal.ZERO) Color(0xFF00984E) else if (valor < BigDecimal.ZERO) Color(0xFFCF5355) else textColor//fiz aqui a validação par nao mudar a cor do texto
         )
         Spacer(Modifier.size(20.dp))
     }

@@ -13,8 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,11 +37,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import br.edu.utfpr.trabalhofinal.R
 import br.edu.utfpr.trabalhofinal.data.TipoLancamentoEnum
 import br.edu.utfpr.trabalhofinal.ui.lancamento.form.composables.FormCheckbox
+import br.edu.utfpr.trabalhofinal.ui.lancamento.form.composables.FormDatePicker
 import br.edu.utfpr.trabalhofinal.ui.lancamento.form.composables.FormRadioButton
 import br.edu.utfpr.trabalhofinal.ui.lancamento.form.composables.FormTextField
 import br.edu.utfpr.trabalhofinal.ui.shared.composables.Carregando
 import br.edu.utfpr.trabalhofinal.ui.shared.composables.ErroAoCarregar
 import br.edu.utfpr.trabalhofinal.ui.theme.TrabalhoFinalTheme
+import java.time.LocalDate
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import br.edu.utfpr.trabalhofinal.ui.lancamento.form.composables.ConfirmationDialog
 
 @Composable
 fun FormularioLancamentoScreen(
@@ -67,6 +70,18 @@ fun FormularioLancamentoScreen(
         }
     }
 
+    if (viewModel.state.mostrarDialogConfirmacao) {
+        ConfirmationDialog(
+            title = stringResource(R.string.atencao),
+            text = stringResource(R.string.mensagem_confirmacao_remover_lancamento),
+            onDismiss = viewModel::ocultarDialogConfirmacao,
+            onConfirm = {
+                viewModel.ocultarDialogConfirmacao()
+                viewModel.removerLancamento()
+            }
+        )
+    }
+
     val contentModifier: Modifier = modifier.fillMaxSize()
     if (viewModel.state.carregando) {
         Carregando(modifier = contentModifier)
@@ -85,7 +100,7 @@ fun FormularioLancamentoScreen(
                     processando = viewModel.state.salvando || viewModel.state.excluindo,
                     onVoltarPressed = onVoltarPressed,
                     onSalvarPressed = viewModel::salvarLancamento,
-                    onExcluirPressed = viewModel::removerLancamento
+                    onExcluirPressed = viewModel::mostrarDialogConfirmacao
                 )
             }
         ) { paddingValues ->
@@ -222,17 +237,18 @@ private fun FormContent(
             value = valor.valor,
             errorMessageCode = valor.codigoMensagemErro,
             onValueChanged = onValorAlterado,
-            keyboardType = KeyboardType.Number,
+            keyboardType = KeyboardType.Decimal,
             enabled = !processando,
             imageVector = Icons.Filled.AttachMoney
         )
-        FormTextField(
+        FormDatePicker(
             modifier = formTextFieldModifier,
             label = stringResource(R.string.data),
-            value = data.valor,
+            value = LocalDate.parse(data.valor),
+            onValueChanged = { novaData -> 
+                onDataAlterada(novaData.toString())
+            },
             errorMessageCode = data.codigoMensagemErro,
-            onValueChanged = onDataAlterada,
-            keyboardType = KeyboardType.Number,
             enabled = !processando
         )
         val checkOptionsModifier = Modifier.padding(vertical = 8.dp)
@@ -277,7 +293,7 @@ private fun FormContentPreview() {
         FormContent(
             processando = false,
             descricao = CampoFormulario(),
-            data = CampoFormulario(),
+            data = CampoFormulario(LocalDate.now().toString()),
             valor = CampoFormulario(),
             paga = CampoFormulario(),
             tipo = CampoFormulario(TipoLancamentoEnum.RECEITA.toString()),

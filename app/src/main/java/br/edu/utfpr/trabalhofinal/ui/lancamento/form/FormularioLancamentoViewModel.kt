@@ -71,12 +71,27 @@ class FormularioLancamentoViewModel(
     }
 
     fun onValorAlterado(novoValor: String) {
-        if (state.valor.valor != novoValor) {
+        val valorFormatado = novoValor.replace(",", ".")
+        if (state.valor.valor != valorFormatado) {
             state = state.copy(
                 valor = state.valor.copy(
-                    valor = novoValor
+                    valor = valorFormatado,
+                    codigoMensagemErro = validarValor(valorFormatado)
                 )
             )
+        }
+    }
+
+    private fun validarValor(valor: String): Int {
+        return if (valor.isBlank()) {
+            R.string.valor_obrigatorio
+        } else {
+            try {
+                BigDecimal(valor)
+                return 0
+            } catch (_: NumberFormatException) {
+                R.string.valor_obrigatorio
+            }
         }
     }
 
@@ -134,6 +149,9 @@ class FormularioLancamentoViewModel(
         state = state.copy(
             descricao = state.descricao.copy(
                 codigoMensagemErro = validarDescricao(state.descricao.valor)
+            ),
+            valor = state.valor.copy(
+                codigoMensagemErro = validarValor(state.valor.valor)
             )
         )
         return state.formularioValido
